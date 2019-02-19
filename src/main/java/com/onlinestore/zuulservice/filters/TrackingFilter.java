@@ -35,6 +35,10 @@ public class TrackingFilter extends ZuulFilter {
 		return filterUtils.getCorrelationId()!=null;
 	}
 
+	private String generateCorrelationId(){
+		return java.util.UUID.randomUUID().toString();
+	}
+
 	@Override
 	public Object run() throws ZuulException {
 		return null;
