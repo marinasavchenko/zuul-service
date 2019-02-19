@@ -1,6 +1,7 @@
 package com.onlinestore.zuulservice.filters;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,6 +42,10 @@ public class TrackingFilter extends ZuulFilter {
 
 	@Override
 	public Object run() throws ZuulException {
+		if (!isCorrelationIdPresent()){
+			filterUtils.setCorrelationId(generateCorrelationId());
+		}
+		RequestContext currentContext = RequestContext.getCurrentContext();
 		return null;
 	}
 }
