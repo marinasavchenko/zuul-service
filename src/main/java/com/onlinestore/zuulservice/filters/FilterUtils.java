@@ -51,4 +51,15 @@ public class FilterUtils {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		currentContext.addZuulRequestHeader(USER_ID, userId);
 	}
+
+	public final String getAuthToken() {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		return currentContext.getRequest().getHeader(AUTH_TOKEN);
+	}
+
+	public String getServiceId() {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		if (currentContext.get("serviceId") == null) return "";
+		return currentContext.get("serviceId").toString();
+	}
 }
