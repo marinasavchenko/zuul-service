@@ -37,4 +37,18 @@ public class FilterUtils {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		currentContext.addZuulRequestHeader(CUSTOMER_ID, customerId);
 	}
+
+	public final String getUserId() {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		if (currentContext.getRequest().getHeader(USER_ID) != null) {
+			return currentContext.getRequest().getHeader(USER_ID);
+		} else {
+			return currentContext.getZuulRequestHeaders().get(USER_ID);
+		}
+	}
+
+	public void setUserId(String userId) {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		currentContext.addZuulRequestHeader(USER_ID, userId);
+	}
 }
