@@ -23,4 +23,18 @@ public class FilterUtils {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		currentContext.addZuulRequestHeader(CORRELATION_ID, correlationId);
 	}
+
+	public final String getCustomerId() {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		if (currentContext.getRequest().getHeader(CUSTOMER_ID) != null) {
+			return currentContext.getRequest().getHeader(CUSTOMER_ID);
+		} else {
+			return currentContext.getZuulRequestHeaders().get(CUSTOMER_ID);
+		}
+	}
+
+	public void setCustomerId(String customerId) {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		currentContext.addZuulRequestHeader(CUSTOMER_ID, customerId);
+	}
 }
