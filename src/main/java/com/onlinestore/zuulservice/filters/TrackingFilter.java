@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TrackingFilter extends ZuulFilter {
-	public static final String PRE_FILTER_TYPE = "pre";
 	private static final int FILTER_ORDER = 1;
 	private static final boolean SHOULD_FILTER = true;
 
@@ -21,7 +20,7 @@ public class TrackingFilter extends ZuulFilter {
 
 	@Override
 	public String filterType() {
-		return PRE_FILTER_TYPE;
+		return FilterUtils.PRE_FILTER_TYPE;
 	}
 
 	@Override
