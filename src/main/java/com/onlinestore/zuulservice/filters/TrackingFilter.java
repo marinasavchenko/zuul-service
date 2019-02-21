@@ -4,7 +4,9 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TrackingFilter extends ZuulFilter {
 	public static final String PRE_FILTER_TYPE = "pre";
 	private static final int FILTER_ORDER = 1;

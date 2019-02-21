@@ -1,7 +1,9 @@
 package com.onlinestore.zuulservice.filters;
 
 import com.netflix.zuul.context.RequestContext;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FilterUtils {
 	public static final String CORRELATION_ID = "onlst-correlation-id";
 	public static final String AUTH_TOKEN = "onlst-auth-token";
