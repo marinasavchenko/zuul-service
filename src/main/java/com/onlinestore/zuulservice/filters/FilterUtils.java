@@ -10,6 +10,7 @@ public class FilterUtils {
 	public static final String USER_ID = "onlst-user-id";
 	public static final String CUSTOMER_ID = "onlst-customer-id";
 	public static final String PRE_FILTER_TYPE = "pre";
+	public static final String POST_FILTER_TYPE = "post";
 
 	public String getCorrelationId() {
 		RequestContext currentContext = RequestContext.getCurrentContext();
