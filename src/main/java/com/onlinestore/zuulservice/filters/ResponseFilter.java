@@ -1,6 +1,7 @@
 package com.onlinestore.zuulservice.filters;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,8 @@ public class ResponseFilter extends ZuulFilter {
 
 	@Override
 	public Object run() throws ZuulException {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		currentContext.getResponse().addHeader(FilterUtils.CORRELATION_ID, filterUtils.getCorrelationId());
 		return null;
 	}
 }
