@@ -11,6 +11,7 @@ public class FilterUtils {
 	public static final String CUSTOMER_ID = "onlst-customer-id";
 	public static final String PRE_FILTER_TYPE = "pre";
 	public static final String POST_FILTER_TYPE = "post";
+	public static final String ROUTE_FILTER_TYPE = "route";
 
 	public String getCorrelationId() {
 		RequestContext currentContext = RequestContext.getCurrentContext();
