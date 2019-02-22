@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 public class AlternativeRoutesFilter extends ZuulFilter {
+	private static final int FILTER_ORDER = 1;
+	private static final boolean SHOULD_FILTER = true;
 
 	private FilterUtils filterUtils;
 	private RestTemplate restTemplate;
@@ -18,17 +20,17 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 
 	@Override
 	public String filterType() {
-		return null;
+		return filterUtils.ROUTE_FILTER_TYPE;
 	}
 
 	@Override
 	public int filterOrder() {
-		return 0;
+		return FILTER_ORDER;
 	}
 
 	@Override
 	public boolean shouldFilter() {
-		return false;
+		return SHOULD_FILTER;
 	}
 
 	@Override
