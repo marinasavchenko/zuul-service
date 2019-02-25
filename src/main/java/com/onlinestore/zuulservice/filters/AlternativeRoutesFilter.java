@@ -73,4 +73,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 
 		return false;
 	}
+
+	private String buildRoute(String oldEndpoint, String newEndpoint, String serviceName) {
+		int index = oldEndpoint.indexOf(serviceName);
+
+		String plainRoute = oldEndpoint.substring(index + serviceName.length());
+		return String.format("%s/%s", newEndpoint, plainRoute);
+	}
+
 }
