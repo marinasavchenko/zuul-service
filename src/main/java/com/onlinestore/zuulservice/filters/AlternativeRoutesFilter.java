@@ -1,6 +1,7 @@
 package com.onlinestore.zuulservice.filters;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.model.RouteRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Random;
 
 public class AlternativeRoutesFilter extends ZuulFilter {
 	private static final String ROUTE_RECORD_URI = "http://alternativeroutesservice/v1/route/records/{serviceName}";
@@ -41,6 +44,10 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 
 	@Override
 	public Object run() throws ZuulException {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		RouteRecord routeRecord = getRouteRecordInfo(filterUtils.getServiceId());
+
+
 		return null;
 	}
 
@@ -53,5 +60,17 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 			throw exception;
 		}
 		return responseEntity.getBody();
+	}
+
+	public boolean shouldUseAlternativeRoute(RouteRecord routeRecord) {
+		Random random = new Random();
+
+		if (routeRecord.getActive().equals("NO")) return false;
+
+		int randomTen = random.nextInt((10 - 1) + 1) + 1;
+
+		if (routeRecord.getWeight() < randomTen) return true;
+
+		return false;
 	}
 }
