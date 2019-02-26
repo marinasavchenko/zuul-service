@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 
 public class AlternativeRoutesFilter extends ZuulFilter {
@@ -93,5 +94,9 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return new ProxyRequestHelper();
 	}
 
+	private String getRequestMethod(HttpServletRequest request) {
+		String requestMethod = request.getMethod();
+		return requestMethod.toUpperCase();
+	}
 
 }
