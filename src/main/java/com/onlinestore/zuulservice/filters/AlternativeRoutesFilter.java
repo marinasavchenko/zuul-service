@@ -5,6 +5,7 @@ import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.model.RouteRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,13 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		RouteRecord routeRecord = getRouteRecordInfo(filterUtils.getServiceId());
 
+		if (routeRecord != null && shouldUseAlternativeRoute(routeRecord)) {
+			String route = buildRoute(
+					currentContext.getRequest().getRequestURI(),
+					routeRecord.getEndpoint(),
+					currentContext.get("serviceId").toString());
+
+		}
 
 		return null;
 	}
@@ -80,5 +88,10 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		String plainRoute = oldEndpoint.substring(index + serviceName.length());
 		return String.format("%s/%s", newEndpoint, plainRoute);
 	}
+
+	private ProxyRequestHelper getProxyRequestHelper() {
+		return new ProxyRequestHelper();
+	}
+
 
 }
