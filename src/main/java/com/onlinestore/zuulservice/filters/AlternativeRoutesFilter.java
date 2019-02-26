@@ -4,6 +4,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.model.RouteRecord;
+import org.apache.http.HttpHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpMethod;
@@ -13,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URL;
 import java.util.Random;
 
 public class AlternativeRoutesFilter extends ZuulFilter {
@@ -97,6 +99,11 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	private String getRequestMethod(HttpServletRequest request) {
 		String requestMethod = request.getMethod();
 		return requestMethod.toUpperCase();
+	}
+
+	private HttpHost getHttpHost(URL url) {
+		HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+		return httpHost;
 	}
 
 }
