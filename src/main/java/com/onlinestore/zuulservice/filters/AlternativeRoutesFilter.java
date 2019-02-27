@@ -4,19 +4,26 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.model.RouteRecord;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+@Component
 public class AlternativeRoutesFilter extends ZuulFilter {
 	private static final String ROUTE_RECORD_URI = "http://alternativeroutesservice/v1/route/records/{serviceName}";
 	private static final int FILTER_ORDER = 1;
@@ -106,4 +113,14 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return httpHost;
 	}
 
+
+	private Header[] convertToBasicHeaders(MultiValueMap<String, String> headers) {
+		List<Header> headerList = new ArrayList<>();
+		for (String name : headers.keySet()) {
+			for (String value : headers.get(name)) {
+				headerList.add(new BasicHeader(name, value));
+			}
+		}
+		return headerList.toArray(new BasicHeader[0]);
+	}
 }
