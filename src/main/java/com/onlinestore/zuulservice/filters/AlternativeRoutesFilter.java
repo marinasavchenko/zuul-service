@@ -6,7 +6,16 @@ import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.model.RouteRecord;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpMethod;
@@ -18,6 +27,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +123,47 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return httpHost;
 	}
 
+//TODO: refactor
+	private HttpResponse invokeAlternativeService(HttpClient httpclient, String verb, String route,
+	                                              HttpServletRequest request, MultiValueMap<String, String> headers,
+	                                              MultiValueMap<String, String> params, InputStream requestEntity)
+			throws Exception {
+
+		URL url = new URL(route);
+		HttpHost httpHost = getHttpHost(url);
+		HttpRequest httpRequest;
+		int contentLength = request.getContentLength();
+
+		InputStreamEntity entity = new InputStreamEntity(requestEntity, contentLength,
+				request.getContentType() != null ? ContentType.create(request.getContentType()) : null);
+		switch (verb.toUpperCase()) {
+			case "POST":
+				HttpPost httpPost = new HttpPost(route);
+				httpRequest = httpPost;
+				httpPost.setEntity(entity);
+				break;
+			case "PUT":
+				HttpPut httpPut = new HttpPut(route);
+				httpRequest = httpPut;
+				httpPut.setEntity(entity);
+				break;
+			case "PATCH":
+				HttpPatch httpPatch = new HttpPatch(route);
+				httpRequest = httpPatch;
+				httpPatch.setEntity(entity);
+				break;
+			default:
+				httpRequest = new BasicHttpRequest(verb, route);
+
+		}
+		try {
+			httpRequest.setHeaders(convertToBasicHeaders(headers));
+			HttpResponse zuulResponse = httpclient.execute(httpHost, httpRequest);
+
+			return zuulResponse;
+		} finally {
+		}
+	}
 
 	private Header[] convertToBasicHeaders(MultiValueMap<String, String> headers) {
 		List<Header> headerList = new ArrayList<>();
