@@ -29,6 +29,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -205,7 +206,11 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 
 	private InputStream getRequestBody(HttpServletRequest request) {
 		InputStream requestEntity = null;
-
+		try {
+			requestEntity = request.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return requestEntity;
 	}
 
