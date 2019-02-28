@@ -14,6 +14,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +125,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return httpHost;
 	}
 
-//TODO: refactor
+	//TODO: refactor
 	private HttpResponse invokeAlternativeService(HttpClient httpclient, String verb, String route,
 	                                              HttpServletRequest request, MultiValueMap<String, String> headers,
 	                                              MultiValueMap<String, String> params, InputStream requestEntity)
@@ -133,9 +135,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		HttpHost httpHost = getHttpHost(url);
 		HttpRequest httpRequest;
 		int contentLength = request.getContentLength();
+		ContentType contentType = null;
+		if (request.getContentType() != null) {
+			contentType = ContentType.create(request.getContentType());
+		}
 
-		InputStreamEntity entity = new InputStreamEntity(requestEntity, contentLength,
-				request.getContentType() != null ? ContentType.create(request.getContentType()) : null);
+		InputStreamEntity entity = new InputStreamEntity(requestEntity, contentLength, contentType);
 		switch (verb.toUpperCase()) {
 			case "POST":
 				HttpPost httpPost = new HttpPost(route);
@@ -174,4 +179,34 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		}
 		return headerList.toArray(new BasicHeader[0]);
 	}
+
+	private void forward(String route) {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		HttpServletRequest request = currentContext.getRequest();
+		ProxyRequestHelper requestHelper = getProxyRequestHelper();
+
+		MultiValueMap<String, String> headers = requestHelper.buildZuulRequestHeaders(request);
+		MultiValueMap<String, String> params = requestHelper.buildZuulRequestQueryParams(request);
+		String verb = request.getMethod().toUpperCase();
+
+		InputStream requestEntity = getRequestBody(request);
+
+		requestHelper.addIgnoredHeaders();
+		CloseableHttpClient httpClient = null;
+		HttpResponse response = null;
+
+		try {
+			httpClient = HttpClients.createDefault();
+			response = invokeAlternativeService(httpClient, verb, route, request, headers, params, requestEntity);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	private InputStream getRequestBody(HttpServletRequest request) {
+		InputStream requestEntity = null;
+
+		return requestEntity;
+	}
+
 }
