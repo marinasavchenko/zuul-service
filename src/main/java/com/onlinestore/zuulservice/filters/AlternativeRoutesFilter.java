@@ -77,7 +77,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 					currentContext.getRequest().getRequestURI(),
 					routeRecord.getEndpoint(),
 					currentContext.get("serviceId").toString());
-
+			forward(route);
 		}
 
 		return null;
