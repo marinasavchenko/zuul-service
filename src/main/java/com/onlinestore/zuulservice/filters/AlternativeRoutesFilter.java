@@ -182,6 +182,18 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return headerList.toArray(new BasicHeader[0]);
 	}
 
+	private MultiValueMap<String, String> convertToStringHeaders(Header[] headers) {
+		MultiValueMap<String, String> stringHeaders = new LinkedMultiValueMap<>();
+		for (Header header : headers) {
+			String name = header.getName();
+			if (!stringHeaders.containsKey(name)) {
+				stringHeaders.put(name, new ArrayList<>());
+			}
+			stringHeaders.get(name).add(header.getValue());
+		}
+		return stringHeaders;
+	}
+
 	private void forward(String route) {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		HttpServletRequest request = currentContext.getRequest();
