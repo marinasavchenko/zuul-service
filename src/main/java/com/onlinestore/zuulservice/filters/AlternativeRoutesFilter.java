@@ -24,6 +24,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -199,9 +200,20 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		try {
 			httpClient = HttpClients.createDefault();
 			response = invokeAlternativeService(httpClient, verb, route, request, headers, params, requestEntity);
+			setResponse(requestHelper, response);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private void setResponse(ProxyRequestHelper requestHelper, HttpResponse response) throws IOException {
+		int statusCode = response.getStatusLine().getStatusCode();
+		InputStream content = null;
+		if (response.getEntity() != null) {
+			content = response.getEntity().getContent();
+		}
+		MultiValueMap<String, String> headers = convertToStringHeaders(response.getAllHeaders());
+		requestHelper.setResponse(statusCode, content, headers);
 	}
 
 	private InputStream getRequestBody(HttpServletRequest request) {
