@@ -1,9 +1,19 @@
 package com.onlinestore.zuulservice.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "routerecords")
 public class RouteRecord {
+	@Column
 	String serviceName;
+	@Column
 	String active;
+	@Column
 	String endpoint;
+	@Column
 	Integer weight;
 
 	public String getServiceName() {
