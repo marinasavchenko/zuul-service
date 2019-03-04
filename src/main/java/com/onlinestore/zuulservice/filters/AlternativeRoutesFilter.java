@@ -117,11 +117,6 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return new ProxyRequestHelper();
 	}
 
-	private String getRequestMethod(HttpServletRequest request) {
-		String requestMethod = request.getMethod();
-		return requestMethod.toUpperCase();
-	}
-
 	private HttpHost getHttpHost(URL url) {
 		HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
 		return httpHost;
