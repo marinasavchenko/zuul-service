@@ -3,7 +3,7 @@ package com.onlinestore.zuulservice.filters;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import com.onlinestore.zuulservice.model.RouteRecord;
+import com.onlinestore.zuulservice.domain.RouteRecord;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;

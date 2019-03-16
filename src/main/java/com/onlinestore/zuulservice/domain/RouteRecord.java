@@ -1,4 +1,4 @@
-package com.onlinestore.zuulservice.model;
+package com.onlinestore.zuulservice.domain;
 
 public class RouteRecord {
 
