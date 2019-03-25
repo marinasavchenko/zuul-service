@@ -1,14 +1,31 @@
 package com.onlinestore.zuulservice.domain;
 
+/**
+ * Route Record class for retrieving and storing routes information from alternative routes service.
+ */
 public class RouteRecord {
-
+	/**
+	 * Name of the service.
+	 */
 	String serviceName;
 	/**
 	 * Active status of route record. Can be "YES" or "NO".
 	 */
 	String activeStatus;
+	/**
+	 * Endpoint of the service.
+	 */
 	String endpoint;
+	/**
+	 * Weight of the route.
+	 */
 	Integer weight;
+
+	/**
+	 * Constructs new empty {@code RouteRecord} instance.
+	 */
+	public RouteRecord() {
+	}
 
 	public String getServiceName() {
 		return serviceName;
