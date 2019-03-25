@@ -3,7 +3,10 @@ package com.onlinestore.zuulservice.domain;
 public class RouteRecord {
 
 	String serviceName;
-	String active;
+	/**
+	 * Active status of route record. Can be "YES" or "NO".
+	 */
+	String activeStatus;
 	String endpoint;
 	Integer weight;
 
@@ -11,8 +14,8 @@ public class RouteRecord {
 		return serviceName;
 	}
 
-	public String getActive() {
-		return active;
+	public String getActiveStatus() {
+		return activeStatus;
 	}
 
 	public String getEndpoint() {
@@ -27,8 +30,8 @@ public class RouteRecord {
 		this.serviceName = serviceName;
 	}
 
-	public void setActive(String active) {
-		this.active = active;
+	public void setActiveStatus(String activeStatus) {
+		this.activeStatus = activeStatus;
 	}
 
 	public void setEndpoint(String endpoint) {

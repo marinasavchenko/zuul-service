@@ -97,7 +97,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	public boolean shouldUseAlternativeRoute(RouteRecord routeRecord) {
 		Random random = new Random();
 
-		if (routeRecord.getActive().equals("NO")) return false;
+		if (routeRecord.getActiveStatus().equals("NO")) return false;
 
 		int randomTen = random.nextInt((10 - 1) + 1) + 1;
 
