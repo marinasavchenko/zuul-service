@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Zuul filter used to inject a correlation ID into the incoming HTTP header for any calls coming into Zuul.
+ * Zuul pre filter used to inspect all incoming requests to the gateway and determine whether there’s an HTTP header
+ * correlation id present in the request.
  */
 @Component
 public class TrackingFilter extends ZuulFilter {
