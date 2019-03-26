@@ -36,7 +36,7 @@ public class TrackingFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Tels Zuul what type of filter is used (pre-, post- or route).
+	 * Tels Zuul what type of filter is used (pre).
 	 *
 	 * @return type of filter
 	 */
