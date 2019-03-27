@@ -37,15 +37,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Zuul route filter used to perform dynamic routing based on a Eureka service ID to do A/B testing between different
+ * versions of the same service.
+ * It routes users call to the alternative customer service or to the customer service defined
+ * in the Zuul route mappings.
+ */
 @Component
 public class AlternativeRoutesFilter extends ZuulFilter {
+	/**
+	 * {@value #ROUTE_RECORD_URI} is the URI of route records in alternative routes service.
+	 */
 	private static final String ROUTE_RECORD_URI = "http://alternativeroutesservice/v1/route/records/{serviceName}";
+	/**
+	 * {@value #FILTER_ORDER} is the default value of filter order.
+	 */
 	private static final int FILTER_ORDER = 1;
+	/**
+	 * {@value #SHOULD_FILTER} is the default value of filter activeness.
+	 */
 	private static final boolean SHOULD_FILTER = true;
-
+	/**
+	 * {@code FilterUtils} class that encapsulates common methods used by filters.
+	 */
 	private FilterUtils filterUtils;
+	/**
+	 * Spring Rest template.
+	 */
 	private RestTemplate restTemplate;
 
+	/**
+	 * Constructs new {@code AlternativeRoutesFilter} instance.
+	 *
+	 * @param filterUtils
+	 * @param restTemplate
+	 */
 	@Autowired
 	public AlternativeRoutesFilter(FilterUtils filterUtils, RestTemplate restTemplate) {
 		this.filterUtils = filterUtils;
@@ -67,6 +93,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return SHOULD_FILTER;
 	}
 
+	/**
+	 * Invokes alternativeroutesservice, determines whether to use alternative route, if yes forwards the route.
+	 *
+	 * @return
+	 * @throws ZuulException
+	 */
 	@Override
 	public Object run() throws ZuulException {
 		RequestContext currentContext = RequestContext.getCurrentContext();
@@ -79,10 +111,15 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 					currentContext.get("serviceId").toString());
 			forward(route);
 		}
-
 		return null;
 	}
 
+	/**
+	 * Calls the alternativeroutesservice endpoint to check whether routing record exists.
+	 *
+	 * @param serviceName name of the service
+	 * @return route record of the service. If there is no record {@code null}.
+	 */
 	private RouteRecord getRouteRecordInfo(String serviceName) {
 		ResponseEntity<RouteRecord> responseEntity;
 		try {
@@ -94,6 +131,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return responseEntity.getBody();
 	}
 
+	/**
+	 * Determines randomly whether to use alternative service route.
+	 *
+	 * @param routeRecord
+	 * @return true if route record exists and random number (between 1 and 10) is more than route weight
+	 */
 	public boolean shouldUseAlternativeRoute(RouteRecord routeRecord) {
 		Random random = new Random();
 
@@ -122,6 +165,19 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return httpHost;
 	}
 
+	/**
+	 * Invokes the alternative service.
+	 *
+	 * @param httpclient
+	 * @param verb
+	 * @param route
+	 * @param request
+	 * @param headers
+	 * @param params
+	 * @param requestEntity
+	 * @return
+	 * @throws Exception
+	 */
 	//TODO: refactor
 	private HttpResponse invokeAlternativeService(HttpClient httpclient, String verb, String route,
 	                                              HttpServletRequest request, MultiValueMap<String, String> headers,
@@ -156,7 +212,6 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 				break;
 			default:
 				httpRequest = new BasicHttpRequest(verb, route);
-
 		}
 		try {
 			httpRequest.setHeaders(convertToBasicHeaders(headers));
@@ -189,6 +244,13 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return stringHeaders;
 	}
 
+	/**
+	 * Takes the response back from the target service and sets it on the HTTP request context used by Zuul.
+	 * The result of {@code invokeAlternativeService} call is saved back to the Zuul server
+	 * through the {@code setResponse} helper method.
+	 *
+	 * @param route
+	 */
 	private void forward(String route) {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		HttpServletRequest request = currentContext.getRequest();
@@ -213,6 +275,13 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		}
 	}
 
+	/**
+	 * Sets the response from target service on the HTTP request context used by Zuul
+	 *
+	 * @param requestHelper
+	 * @param response response from target service
+	 * @throws IOException
+	 */
 	private void setResponse(ProxyRequestHelper requestHelper, HttpResponse response) throws IOException {
 		int statusCode = response.getStatusLine().getStatusCode();
 		InputStream content = null;
@@ -223,6 +292,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		requestHelper.setResponse(statusCode, content, headers);
 	}
 
+	/**
+	 * Gets request body from request.
+	 *
+	 * @param request
+	 * @return request body
+	 */
 	private InputStream getRequestBody(HttpServletRequest request) {
 		InputStream requestEntity = null;
 		try {
