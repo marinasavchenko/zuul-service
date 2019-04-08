@@ -36,7 +36,7 @@ public class ResponseFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Tels Zuul what type of filter is used (post).
+	 * Returns type of filter.
 	 *
 	 * @return type of filter
 	 */
@@ -46,7 +46,7 @@ public class ResponseFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Indicates order of filters Zuul should send requests through.
+	 * Returns order of filters Zuul should send requests through.
 	 *
 	 * @return value of order
 	 */

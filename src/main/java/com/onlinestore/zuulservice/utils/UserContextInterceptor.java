@@ -11,17 +11,17 @@ import java.io.IOException;
 /**
  * Implementation of the {@link ClientHttpRequestInterceptor} interface.
  * <p>
- * Used to inject the {@code UserContext} values (like correlation ID) into any outgoing HTTP-based service requests
- * being executed from a RestTemplate instance for establishing a linkage between service calls.
+ * Used to inject {@code UserContext} values (like correlation ID) into any outgoing HTTP-based service requests
+ * being executed from RestTemplate instance for establishing a linkage between service calls.
  */
 public class UserContextInterceptor implements ClientHttpRequestInterceptor {
 	/**
-	 * Adds the {@code UserContext} values (like correlation ID) into any outgoing HTTP-based service requests.
+	 * Adds {@code UserContext} values (like correlation ID) into any outgoing HTTP-based service requests.
 	 *
 	 * @param request   request to be modified
 	 * @param body      request body
 	 * @param execution execution to execute the request
-	 * @return the response
+	 * @return response
 	 * @throws IOException
 	 */
 	@Override

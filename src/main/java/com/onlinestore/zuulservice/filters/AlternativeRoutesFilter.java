@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Zuul route filter used to perform dynamic routing based on a Eureka service ID to do A/B testing between different
+ * Zuul route filter used to perform dynamic routing based on Eureka service ID to do A/B testing between different
  * versions of the same service.
- * It routes users call to the alternative customer service or to the customer service defined
+ * Routes users call to the alternative customer service or to the customer service defined
  * in the Zuul route mappings.
  */
 @Component
@@ -115,11 +115,12 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Calls the alternativeroutesservice endpoint to check whether routing record exists.
+	 * Calls alternativeroutesservice endpoint to check whether routing record exists.
 	 *
 	 * @param serviceName name of the service
-	 * @return route record of the service. If there is no record {@code null}.
+	 * @return route record of the service or {@code null} if there is no record .
 	 */
+	//TODO: use Optional?
 	private RouteRecord getRouteRecordInfo(String serviceName) {
 		ResponseEntity<RouteRecord> responseEntity;
 		try {
@@ -166,7 +167,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Invokes the alternative service.
+	 * Invokes alternative service.
 	 *
 	 * @param httpclient
 	 * @param verb
@@ -293,7 +294,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	}
 
 	/**
-	 * Gets request body from request.
+	 * Returns request body from request.
 	 *
 	 * @param request
 	 * @return request body

@@ -40,10 +40,10 @@ public class FilterUtils {
 	public static final String ROUTE_FILTER_TYPE = "route";
 
 	/**
-	 * Gets correlation id.
+	 * Returns correlation id.
 	 * <p>
 	 * Checks whether correlation id is set on the HTTP Headers for the incoming request.
-	 * If it isn’t there, check the ZuulRequestHeaders.
+	 * If it isn’t there, checks ZuulRequestHeaders.
 	 *
 	 * @return correlation id
 	 */
@@ -61,7 +61,7 @@ public class FilterUtils {
 	 * Adds correlation id value to the HTTP request headers.
 	 * <p>
 	 * {@code addZuulRequestHeader} maintains a separate map of HTTP headers.
-	 * The data will be merged, when the target service is invoked by your Zuul server
+	 * The data will be merged, when the target service is invoked by your Zuul server.
 	 *
 	 * @param correlationId
 	 */
@@ -71,7 +71,7 @@ public class FilterUtils {
 	}
 
 	/**
-	 * Gets customer id.
+	 * Returns customer id.
 	 *
 	 * @return customer id
 	 */
@@ -95,7 +95,7 @@ public class FilterUtils {
 	}
 
 	/**
-	 * Gets user id.
+	 * Returns user id.
 	 *
 	 * @return user id
 	 */
@@ -119,7 +119,7 @@ public class FilterUtils {
 	}
 
 	/**
-	 * Gets authentication token.
+	 * Returns authentication token.
 	 *
 	 * @return auth token
 	 */
@@ -129,9 +129,9 @@ public class FilterUtils {
 	}
 
 	/**
-	 * Gets id of a service.
+	 * Returns id of the service.
 	 *
-	 * @return id of a service
+	 * @return id of the service
 	 */
 	public String getServiceId() {
 		RequestContext currentContext = RequestContext.getCurrentContext();
