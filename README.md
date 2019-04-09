@@ -4,6 +4,16 @@ Services gateway.
 The service client talks only to a single URL managed by the service gateway.
 The service gateway determines what service the service client is trying to invoke.
 
+## **Technology stack**
+
+* Java 8
+* Spring Boot 2
+* Spring Cloud 2
+* Netflix Zuul
+
+* Maven
+* Docker
+
 ## **Building**
 
 To compile source code and build Docker image:
@@ -25,12 +35,3 @@ To run tests via Maven:
 mvn clean test
 ```
 
-## **Technology stack**
-
-* Java
-* Spring Boot
-* Spring Cloud
-* Netflix Zuul
-
-* Maven
-* Docker
