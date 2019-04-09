@@ -6,21 +6,21 @@ The service gateway determines what service the service client is trying to invo
 
 ## **Building**
 
-1. To compile source code and build Docker image:
+To compile source code and build Docker image:
 ```
 mvn clean package docker:build
 ```
 
 ## **Running**
 
-1. To start service in Docker container:
+To start service in Docker container:
 ```
 docker run marinasavchenko/onlinestore-zuulsrv:v1
 ```
 
 ## **Running the tests**
 
-1.To run tests via Maven:
+To run tests via Maven:
 ```
 mvn clean test
 ```
