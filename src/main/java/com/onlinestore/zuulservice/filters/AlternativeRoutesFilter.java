@@ -4,6 +4,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 import com.onlinestore.zuulservice.domain.RouteRecord;
+import com.onlinestore.zuulservice.utils.RandomGenerator;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -35,7 +36,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Zuul route filter used to perform dynamic routing based on Eureka service ID to do A/B testing between different
@@ -65,17 +65,23 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	 * Spring Rest template.
 	 */
 	private RestTemplate restTemplate;
+	/**
+	 * Generator of random int.
+	 */
+	private RandomGenerator randomGenerator;
 
 	/**
 	 * Constructs new {@code AlternativeRoutesFilter} instance.
 	 *
 	 * @param filterUtils
 	 * @param restTemplate
+	 * @param randomGenerator
 	 */
 	@Autowired
-	public AlternativeRoutesFilter(FilterUtils filterUtils, RestTemplate restTemplate) {
+	public AlternativeRoutesFilter(FilterUtils filterUtils, RestTemplate restTemplate, RandomGenerator randomGenerator) {
 		this.filterUtils = filterUtils;
 		this.restTemplate = restTemplate;
+		this.randomGenerator = randomGenerator;
 	}
 
 	@Override
@@ -115,6 +121,18 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	}
 
 	/**
+	 * Determines randomly whether to use alternative service route.
+	 *
+	 * @param routeRecord
+	 * @return true if route record status is active and random number (between 1 and 10) is more than route weight
+	 */
+	public boolean shouldUseAlternativeRoute(RouteRecord routeRecord) {
+		if (routeRecord.getActiveStatus().equals("NO")) return false;
+		if (routeRecord.getWeight() < randomGenerator.getRandomInt()) return true;
+		return false;
+	}
+
+	/**
 	 * Calls alternativeroutesservice endpoint to check whether routing record exists.
 	 *
 	 * @param serviceName name of the service
@@ -130,24 +148,6 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 			throw exception;
 		}
 		return responseEntity.getBody();
-	}
-
-	/**
-	 * Determines randomly whether to use alternative service route.
-	 *
-	 * @param routeRecord
-	 * @return true if route record exists and random number (between 1 and 10) is more than route weight
-	 */
-	public boolean shouldUseAlternativeRoute(RouteRecord routeRecord) {
-		Random random = new Random();
-
-		if (routeRecord.getActiveStatus().equals("NO")) return false;
-
-		int randomTen = random.nextInt((10 - 1) + 1) + 1;
-
-		if (routeRecord.getWeight() < randomTen) return true;
-
-		return false;
 	}
 
 	private String buildRoute(String oldEndpoint, String newEndpoint, String serviceName) {
