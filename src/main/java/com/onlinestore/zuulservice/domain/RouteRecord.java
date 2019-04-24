@@ -27,6 +27,13 @@ public class RouteRecord {
 	public RouteRecord() {
 	}
 
+	public RouteRecord(String serviceName, String activeStatus, String endpoint, Integer weight) {
+		this.serviceName = serviceName;
+		this.activeStatus = activeStatus;
+		this.endpoint = endpoint;
+		this.weight = weight;
+	}
+
 	public String getServiceName() {
 		return serviceName;
 	}
