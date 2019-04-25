@@ -1,7 +1,10 @@
 package com.onlinestore.zuulservice.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Random;
 
+@Component
 public class RandomGenerator {
 
 	public int getRandomInt() {
