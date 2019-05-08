@@ -21,14 +21,9 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -61,10 +56,8 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	 * {@code FilterUtils} class that encapsulates common methods used by filters.
 	 */
 	private FilterUtils filterUtils;
-	/**
-	 * Spring Rest template.
-	 */
-	private RestTemplate restTemplate;
+
+	private RouteRecordProxy routeRecordProxy;
 	/**
 	 * Generator of random int.
 	 */
@@ -74,13 +67,13 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	 * Constructs new {@code AlternativeRoutesFilter} instance.
 	 *
 	 * @param filterUtils
-	 * @param restTemplate
+	 * @param routeRecordProxy
 	 * @param randomGenerator
 	 */
 	@Autowired
-	public AlternativeRoutesFilter(FilterUtils filterUtils, RestTemplate restTemplate, RandomGenerator randomGenerator) {
+	public AlternativeRoutesFilter(FilterUtils filterUtils,RouteRecordProxy routeRecordProxy, RandomGenerator randomGenerator) {
 		this.filterUtils = filterUtils;
-		this.restTemplate = restTemplate;
+		this.routeRecordProxy = routeRecordProxy;
 		this.randomGenerator = randomGenerator;
 	}
 
@@ -108,7 +101,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	@Override
 	public Object run() throws ZuulException {
 		RequestContext currentContext = RequestContext.getCurrentContext();
-		RouteRecord routeRecord = getRouteRecordInfo(filterUtils.getServiceId());
+		RouteRecord routeRecord = routeRecordProxy.getRouteRecordInfo(filterUtils.getServiceId()).get();
 
 		if (routeRecord != null && shouldUseAlternativeRoute(routeRecord)) {
 			String route = buildRoute(
@@ -130,24 +123,6 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		if (routeRecord.getActiveStatus().equals("NO")) return false;
 		if (routeRecord.getWeight() < randomGenerator.getRandomInt()) return true;
 		return false;
-	}
-
-	/**
-	 * Calls alternativeroutesservice endpoint to check whether routing record exists.
-	 *
-	 * @param serviceName name of the service
-	 * @return route record of the service or {@code null} if there is no record .
-	 */
-	//TODO: use Optional?
-	private RouteRecord getRouteRecordInfo(String serviceName) {
-		ResponseEntity<RouteRecord> responseEntity;
-		try {
-			responseEntity = restTemplate.exchange(ROUTE_RECORD_URI, HttpMethod.GET, null, RouteRecord.class, serviceName);
-		} catch (HttpClientErrorException exception) {
-			if (exception.getStatusCode() == HttpStatus.NOT_FOUND) return null;
-			throw exception;
-		}
-		return responseEntity.getBody();
 	}
 
 	private String buildRoute(String oldEndpoint, String newEndpoint, String serviceName) {
