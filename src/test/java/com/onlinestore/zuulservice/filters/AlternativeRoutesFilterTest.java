@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -24,14 +23,14 @@ public class AlternativeRoutesFilterTest {
 	private FilterUtils filterUtils;
 
 	@Mock
-	private RestTemplate restTemplate;
+	private RouteRecordProxy routeRecordProxy;
 
 	@Mock
 	private RandomGenerator randomGenerator;
 
 	@Before
 	public void setUp() throws Exception {
-		alternativeRoutesFilter = new AlternativeRoutesFilter(filterUtils, restTemplate, randomGenerator);
+		alternativeRoutesFilter = new AlternativeRoutesFilter(filterUtils, routeRecordProxy, randomGenerator);
 	}
 
 	@Test
