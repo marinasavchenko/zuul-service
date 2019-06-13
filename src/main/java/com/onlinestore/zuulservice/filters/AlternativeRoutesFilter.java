@@ -41,10 +41,6 @@ import java.util.List;
 @Component
 public class AlternativeRoutesFilter extends ZuulFilter {
 	/**
-	 * {@value #ROUTE_RECORD_URI} is the URI of route records in alternative routes service.
-	 */
-	private static final String ROUTE_RECORD_URI = "http://alternativeroutesservice/v1/route/records/{serviceName}";
-	/**
 	 * {@value #FILTER_ORDER} is the default value of filter order.
 	 */
 	private static final int FILTER_ORDER = 1;
