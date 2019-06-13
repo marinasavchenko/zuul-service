@@ -71,7 +71,7 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 	 * @param randomGenerator
 	 */
 	@Autowired
-	public AlternativeRoutesFilter(FilterUtils filterUtils,RouteRecordProxy routeRecordProxy, RandomGenerator randomGenerator) {
+	public AlternativeRoutesFilter(FilterUtils filterUtils, RouteRecordProxy routeRecordProxy, RandomGenerator randomGenerator) {
 		this.filterUtils = filterUtils;
 		this.routeRecordProxy = routeRecordProxy;
 		this.randomGenerator = randomGenerator;
@@ -132,13 +132,55 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		return String.format("%s/%s", newEndpoint, plainRoute);
 	}
 
+	/**
+	 * Takes the response back from the target service and sets it on the HTTP request context used by Zuul.
+	 * The result of {@code invokeAlternativeService} call is saved back to the Zuul server
+	 * through the {@code setResponse} helper method.
+	 *
+	 * @param route
+	 */
+	private void forward(String route) {
+		RequestContext currentContext = RequestContext.getCurrentContext();
+		HttpServletRequest request = currentContext.getRequest();
+		ProxyRequestHelper requestHelper = getProxyRequestHelper();
+
+		MultiValueMap<String, String> headers = requestHelper.buildZuulRequestHeaders(request);
+		MultiValueMap<String, String> params = requestHelper.buildZuulRequestQueryParams(request);
+		String verb = request.getMethod().toUpperCase();
+
+		InputStream requestEntity = getRequestBody(request);
+
+		requestHelper.addIgnoredHeaders();
+		CloseableHttpClient httpClient = null;
+		HttpResponse response = null;
+
+		try {
+			httpClient = HttpClients.createDefault();
+			response = invokeAlternativeService(httpClient, verb, route, request, headers, params, requestEntity);
+			setResponse(requestHelper, response);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	private ProxyRequestHelper getProxyRequestHelper() {
 		return new ProxyRequestHelper();
 	}
 
-	private HttpHost getHttpHost(URL url) {
-		HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-		return httpHost;
+	/**
+	 * Returns request body from request.
+	 *
+	 * @param request
+	 * @return request body
+	 */
+	private InputStream getRequestBody(HttpServletRequest request) {
+		InputStream requestEntity = null;
+		try {
+			requestEntity = request.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return requestEntity;
 	}
 
 	/**
@@ -198,6 +240,11 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		}
 	}
 
+	private HttpHost getHttpHost(URL url) {
+		HttpHost httpHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+		return httpHost;
+	}
+
 	private Header[] convertToBasicHeaders(MultiValueMap<String, String> headers) {
 		List<Header> headerList = new ArrayList<>();
 		for (String name : headers.keySet()) {
@@ -206,49 +253,6 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 			}
 		}
 		return headerList.toArray(new BasicHeader[0]);
-	}
-
-	private MultiValueMap<String, String> convertToStringHeaders(Header[] headers) {
-		MultiValueMap<String, String> stringHeaders = new LinkedMultiValueMap<>();
-		for (Header header : headers) {
-			String name = header.getName();
-			if (!stringHeaders.containsKey(name)) {
-				stringHeaders.put(name, new ArrayList<>());
-			}
-			stringHeaders.get(name).add(header.getValue());
-		}
-		return stringHeaders;
-	}
-
-	/**
-	 * Takes the response back from the target service and sets it on the HTTP request context used by Zuul.
-	 * The result of {@code invokeAlternativeService} call is saved back to the Zuul server
-	 * through the {@code setResponse} helper method.
-	 *
-	 * @param route
-	 */
-	private void forward(String route) {
-		RequestContext currentContext = RequestContext.getCurrentContext();
-		HttpServletRequest request = currentContext.getRequest();
-		ProxyRequestHelper requestHelper = getProxyRequestHelper();
-
-		MultiValueMap<String, String> headers = requestHelper.buildZuulRequestHeaders(request);
-		MultiValueMap<String, String> params = requestHelper.buildZuulRequestQueryParams(request);
-		String verb = request.getMethod().toUpperCase();
-
-		InputStream requestEntity = getRequestBody(request);
-
-		requestHelper.addIgnoredHeaders();
-		CloseableHttpClient httpClient = null;
-		HttpResponse response = null;
-
-		try {
-			httpClient = HttpClients.createDefault();
-			response = invokeAlternativeService(httpClient, verb, route, request, headers, params, requestEntity);
-			setResponse(requestHelper, response);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	/**
@@ -268,20 +272,17 @@ public class AlternativeRoutesFilter extends ZuulFilter {
 		requestHelper.setResponse(statusCode, content, headers);
 	}
 
-	/**
-	 * Returns request body from request.
-	 *
-	 * @param request
-	 * @return request body
-	 */
-	private InputStream getRequestBody(HttpServletRequest request) {
-		InputStream requestEntity = null;
-		try {
-			requestEntity = request.getInputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
+	private MultiValueMap<String, String> convertToStringHeaders(Header[] headers) {
+		MultiValueMap<String, String> stringHeaders = new LinkedMultiValueMap<>();
+		for (Header header : headers) {
+			String name = header.getName();
+			if (!stringHeaders.containsKey(name)) {
+				stringHeaders.put(name, new ArrayList<>());
+			}
+			stringHeaders.get(name).add(header.getValue());
 		}
-		return requestEntity;
+		return stringHeaders;
 	}
+
 
 }
